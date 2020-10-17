@@ -3,6 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="style.css">
+        <title>Formulir Langganan Internet - Rafatek</title>
     </head>
     <body>
 
@@ -84,9 +85,16 @@
                 dropdown.selectedIndex = 0;
 
                 fetch(api+'serviceplans?type=pppoe&company='+company).then(
-                    response => response.json()
+                    response => {
+                        if (response.status == 200) {
+                            return response.json()
+                        } else {
+                            alert('Gagal menampilkan data, Silahkan coba beberapa saat lagi!')
+                        }
+                    }
                 ).then(
                     data => {
+                        console.log(data);
                         let option;
                         for (let i = 0; i < data.length; i++) {
                         option = document.createElement('option');
@@ -110,7 +118,13 @@
                     },
                     body: dataCustomer
                 }).then(
-                    response => response.json()
+                    response => {
+                        if (response.status == 200) {
+                            return response.json()
+                        } else {
+                            alert('Formulir gagal dikirim, Silahkan coba beberapa saat lagi!')
+                        }
+                    }
                 ).then(
                     data => {
                         document.getElementById('form-register').style.display = 'none'   
