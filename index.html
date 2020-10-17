@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+
+        <div class="container" id="form-register">
+            <div style="text-align: center;">
+                <img  width="200" src="./logo.png" alt="" srcset="">
+            </div>
+            <h2 style="text-align: center;color: #0174c5;">Formulir Langganan Internet</h2>
+            <form id="myForm">
+                <div class="row">
+                    <div class="col-25">
+                        <label for="fname">*Nama Lengkap :</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="text" id="fname" name="name" placeholder="Nama lengkap" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-25">
+                        <label for="fname">*Nomor HP :</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="text" id="fname" name="phone" placeholder="Masukan nomor hp" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-25">
+                        <label for="fname">Email :</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="email" id="fname" name="email" placeholder="Alamat email aktif, kosongkan jika tidak ada" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-25">
+                        <label for="package-dropdown">*Pilih Paket :</label>
+                    </div>
+                    <div class="col-75">
+                        <select id="package-dropdown" name="serviceplan">
+                            <option value="australia">Australia</option>
+                            <option value="canada">Canada</option>
+                            <option value="usa">USA</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-25">
+                        <label for="address">*Alamat :</label>
+                    </div>
+                    <div class="col-75">
+                        <textarea
+                            id="address"
+                            name="address"
+                            placeholder="Masukan alamat lengkap anda"
+                            style="height:200px"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+        <div class="container" id="register-sucess" style="text-align: center;">
+            <h2>Terimakasih, permintaan anda akan segera kami proses</h2>
+            <p>
+                Jika dalam 1x24 Jam team kami tidak menghubungi anda. Silahkan hubungi nomor <a href="tel:02517589950">0251 7589 950</a>
+            </p>
+        </div>
+        <script>
+            document.getElementById('register-sucess').style.display = 'none'   
+            var api = 'http://localhost:1338/';
+            let company = '5d9b174f436d0141028f33f0'
+            function getPaket() {
+                let dropdown = document.getElementById('package-dropdown');
+                dropdown.length = 0;
+                let defaultOption = document.createElement('option');
+                defaultOption.text = 'Pilih Paket';
+                dropdown.add(defaultOption);
+                dropdown.selectedIndex = 0;
+
+                fetch(api+'serviceplans?type=pppoe&company='+company).then(
+                    response => response.json()
+                ).then(
+                    data => {
+                        let option;
+                        for (let i = 0; i < data.length; i++) {
+                        option = document.createElement('option');
+                            option.text = data[i].name;
+                            option.value = data[i].id;
+                            dropdown.add(option);
+                        }    
+                    }
+                );
+            }
+            function sendData(data) {
+                console.log(data);
+                let dataCustomer = JSON.stringify({
+                        ...data,
+                        provider: company
+                    })
+                fetch(api+'prospectivecustomers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: dataCustomer
+                }).then(
+                    response => response.json()
+                ).then(
+                    data => {
+                        document.getElementById('form-register').style.display = 'none'   
+                        document.getElementById('register-sucess').style.display = ''   
+                    }
+                );
+            }
+            // Access the form element...
+            const form = document.getElementById( "myForm" );
+
+            // ...and take over its submit event.
+            form.addEventListener( "submit", function ( event ) {
+                event.preventDefault();
+                let reqBody = {};
+                Object.keys(form.elements).forEach(key => {
+                    let element = form.elements[key];
+                    if (element.type !== "submit") {
+                        reqBody[element.name] = element.value;
+                    }
+                });
+                sendData(reqBody);
+            });
+
+            getPaket();
+        </script>
+    </body>
+</html>
